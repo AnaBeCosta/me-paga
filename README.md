@@ -1,6 +1,6 @@
 💡 Projeto em construção**
 
-**# mepaga 🧾💬
+# MePaga 🧾💬
 
 Este projeto nasceu de uma necessidade real: ajudar meu pai a pagar as contas em dia.
 
