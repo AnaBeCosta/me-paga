@@ -1,4 +1,4 @@
-package com.example.mepaga;
+package com.anabeatriz.mepaga;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
