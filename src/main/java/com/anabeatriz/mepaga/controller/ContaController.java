@@ -17,13 +17,18 @@ public class ContaController {
         this.contaService = contaService;
     }
 
-    @PostMapping
+    @PostMapping("/salvar")
     public Conta salvar(@RequestBody Conta conta){
         return contaService.salvar(conta);
     }
 
-    @GetMapping
+    @GetMapping("/listar")
     public List<Conta> listarContas() {
         return contaService.listarContas();
+    }
+
+    @DeleteMapping("/deletar/{id}")
+    public void deletarConta(@PathVariable Long id) {
+        contaService.deletar(id);
     }
 }

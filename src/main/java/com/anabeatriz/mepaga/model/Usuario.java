@@ -25,5 +25,5 @@ public class Usuario {
     private String name;
 
     @ManyToOne
-    private OrigemContato origem_contato;
+    private OrigemContato origemContato;
 }

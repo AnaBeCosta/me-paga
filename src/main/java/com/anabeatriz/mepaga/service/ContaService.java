@@ -11,15 +11,21 @@ public class ContaService {
 
     private final ContaRepository contaRepository;
 
-    public ContaService(ContaRepository contaRepository){
+    public ContaService(ContaRepository contaRepository) {
         this.contaRepository = contaRepository;
     }
 
-    public Conta salvar(Conta conta){
+    public Conta salvar(Conta conta) {
         return contaRepository.save(conta);
     }
 
-    public List<Conta> listarContas(){
+    public List<Conta> listarContas() {
         return contaRepository.findAll();
+    }
+
+    public void deletar(Long id) {
+        Conta conta = contaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Conta não encontrado"));
+        contaRepository.delete(conta);
     }
 }
