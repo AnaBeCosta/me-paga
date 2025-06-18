@@ -4,26 +4,37 @@ import com.anabeatriz.mepaga.dto.LoginRequestDto;
 import com.anabeatriz.mepaga.dto.LoginResponseDto;
 import com.anabeatriz.mepaga.dto.UsuarioRequestDto;
 import com.anabeatriz.mepaga.model.Usuario;
+import com.anabeatriz.mepaga.repository.ContaRepository;
 import com.anabeatriz.mepaga.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UsuarioService {
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+
+    private final UsuarioRepository usuarioRepository;
+    private final ContaRepository contaRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private TokenService tokenService;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    public UsuarioService(UsuarioRepository usuarioRepository,
+                          ContaRepository contaRepository,
+                          PasswordEncoder passwordEncoder,
+                          TokenService tokenService,
+                          AuthenticationManager authenticationManager) {
+        this.usuarioRepository = usuarioRepository;
+        this.contaRepository = contaRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.tokenService = tokenService;
+        this.authenticationManager = authenticationManager;
+    }
 
     public void cadastrar(UsuarioRequestDto dto) {
         if (usuarioRepository.findByEmail(dto.email()).isPresent()) {
@@ -32,7 +43,7 @@ public class UsuarioService {
 
         Usuario user = new Usuario();
         user.setEmail(dto.email());
-        user.setPassword(passwordEncoder.encode(dto.password()));
+        user.setPassword(passwordEncoder.encode(dto.password())); // Garante que a senha seja salva corretamente
         user.setName(dto.name());
         user.setOrigemContato(dto.origemContato());
         usuarioRepository.save(user);
@@ -49,10 +60,24 @@ public class UsuarioService {
         return new LoginResponseDto(token);
     }
 
-    public void deletar(Long id){
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    public Usuario getUsuarioLogado() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("Usuário não autenticado");
+        }
 
-        usuarioRepository.delete(usuario);
+        var email = authentication.getName();
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    }
+
+    @Transactional
+    public void deletar(Long id){
+        if (contaRepository.findByUsuarioId(id).isEmpty()) {
+            // Exclui diretamente se não houver contas associadas
+            usuarioRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Usuário possui contas associadas e não pode ser excluído.");
+        }
     }
 }

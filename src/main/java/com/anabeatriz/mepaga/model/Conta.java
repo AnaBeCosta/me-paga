@@ -1,9 +1,6 @@
 package com.anabeatriz.mepaga.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,4 +21,7 @@ public class Conta {
     private Double valor;
     private Boolean paga;
     private Integer parcelas;
+
+    @ManyToOne
+    private Usuario usuario;
 }

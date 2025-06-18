@@ -2,14 +2,16 @@ package com.anabeatriz.mepaga.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "users")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Usuario {
 
     @Id
@@ -26,4 +28,5 @@ public class Usuario {
 
     @ManyToOne
     private OrigemContato origemContato;
+
 }

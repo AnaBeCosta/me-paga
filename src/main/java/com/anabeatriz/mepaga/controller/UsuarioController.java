@@ -25,7 +25,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public LoginResponseDto login(LoginRequestDto loginRequestDto){
+    public LoginResponseDto login(@RequestBody LoginRequestDto loginRequestDto){
         return usuarioService.login(loginRequestDto);
     }
 
