@@ -23,4 +23,8 @@ Além disso, o sistema permite que o usuário **confirme o pagamento diretamente
 - Banco de dados (PostgreSQL)
 - Importação via Apache POI (para leitura de Excel)
 
+  Acesse a documentação interativa da API pelo Swagger:
+
+👉 [Swagger UI](https://me-paga.onrender.com/swagger-ui.html)
+
 ---
