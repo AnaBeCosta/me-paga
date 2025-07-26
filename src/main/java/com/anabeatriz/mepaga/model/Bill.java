@@ -1,5 +1,6 @@
 package com.anabeatriz.mepaga.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,13 +25,15 @@ public class Bill {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
-    public Bill(String description, LocalDate localDate, Double amount, Boolean paid, Integer installments) {
+    public Bill(String description, LocalDate localDate, Double amount, Boolean paid, Integer installments, User user) {
         this.setDescription(description);
         this.setDueDate(localDate);
         this.setAmount(amount);
         this.setIsPaid(paid);
         this.setInstallments(installments);
+        this.setUser(user);
     }
 }

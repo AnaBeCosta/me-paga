@@ -34,5 +34,7 @@ build/
 .vscode/
 
 ### Arquivos
-.env
+src/main/resources/.env
 docker-compose.yml
+
+Anotações

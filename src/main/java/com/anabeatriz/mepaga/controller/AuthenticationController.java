@@ -45,7 +45,7 @@ public class AuthenticationController {
         if(this.userRepository.findByLogin(data.login()) != null) return ResponseEntity.badRequest().body("Usuário já cadastrado");
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        User newUser = new User(data.login(), encryptedPassword, data.name(), data.source());
+        User newUser = new User(data.login(), encryptedPassword, data.name(), data.phone(), data.source());
 
         this.userRepository.save(newUser);
 

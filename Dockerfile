@@ -1,26 +1,33 @@
-# Usa a imagem oficial do OpenJDK 21 (para Java 21)
-FROM eclipse-temurin:21-jdk-alpine
+# Estágio 1: Build da aplicação com Maven
+# Usamos uma imagem completa do Maven com JDK para compilar o código
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 
-# Define o diretório de trabalho dentro do container
+# Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
 
-# Copia o arquivo pom.xml e o diretório src para o container
+# Copia o pom.xml primeiro para aproveitar o cache de dependências do Docker
 COPY pom.xml .
+
+# Baixa as dependências. Se o pom.xml não mudar, o Docker reutilizará o cache desta camada
+RUN mvn dependency:go-offline
+
+# Copia o resto do código fonte
 COPY src ./src
 
-# Instala o Maven para construir a aplicação
-RUN apk add --no-cache maven
+# Compila a aplicação e gera o arquivo .jar, pulando os testes
+RUN mvn package -DskipTests
 
-# Compila o projeto e empacota o jar
-RUN mvn clean package -DskipTests
+# Estágio 2: Criação da imagem final
+# Usamos uma imagem base do Java muito menor, apenas com o necessário para rodar a aplicação
+FROM eclipse-temurin:21-jre-jammy
 
-# Copia o jar gerado para o diretório /app
-# O nome do jar será algo como mepaga-0.0.1-SNAPSHOT.jar
-# Ajuste caso tenha outro nome ou versão
-RUN cp target/mepaga-0.0.1-SNAPSHOT.jar app.jar
+WORKDIR /app
 
-# Expõe a porta padrão do Spring Boot
+# Copia apenas o arquivo .jar gerado no estágio anterior
+COPY --from=build /app/target/*.jar app.jar
+
+# Expõe a porta que a aplicação Spring Boot usa (padrão 8080)
 EXPOSE 8080
 
-# Comando para rodar a aplicação
-ENTRYPOINT ["java","-jar","app.jar"]
+# Comando para iniciar a aplicação quando o contêiner for executado
+ENTRYPOINT ["java", "-jar", "app.jar"]

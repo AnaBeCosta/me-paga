@@ -23,12 +23,10 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String login;
-
     private String password;
-
     private String name;
+    private String phone;
 
     @Enumerated(EnumType.STRING)
     private ContactSource source;
@@ -36,11 +34,12 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bill> bill = new ArrayList<>();
 
-    public User(String login, String encryptedPassword, String name, ContactSource source) {
+    public User(String login, String encryptedPassword, String name, String phone, ContactSource source) {
         this.login = login;
         this.password = encryptedPassword;
         this.name = name;
         this.source = source;
+        this.phone = phone;
     }
 
     @Override
