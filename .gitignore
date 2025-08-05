@@ -36,5 +36,8 @@ build/
 ### Arquivos
 src/main/resources/.env
 docker-compose.yml
+whatsapp-web/node_modules
+whatsapp-web/.wwebjs_cache
+whatsapp-web/.wwebjs_auth
 
 Anotações

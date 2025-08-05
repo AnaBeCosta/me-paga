@@ -17,12 +17,14 @@ public class BillReminderService {
     @Autowired
     private BillRepository billRepository;
 
+    @Autowired
+    private WhatsappService service;
+
     @Scheduled(cron = "0 * * * * *") // a cada minuto
+    //@Scheduled(cron = "0 0 8,20 * * *")
     public void checkBills() {
         LocalDate today = LocalDate.now();
         LocalDate upcoming = today.plusDays(2);
-
-        WhatsappService service = new WhatsappService();
 
         List<BillRepositoryDTO> bills = billRepository.findByDueDateBetween(today, upcoming);
 

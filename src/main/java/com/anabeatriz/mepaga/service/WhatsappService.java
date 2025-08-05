@@ -1,27 +1,42 @@
 package com.anabeatriz.mepaga.service;
 
 import com.anabeatriz.mepaga.dto.BillRepositoryDTO;
-import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.Message;
-import com.twilio.type.PhoneNumber;
-import io.github.cdimascio.dotenv.Dotenv;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
+@Service
 public class WhatsappService {
-    Dotenv dotenv = Dotenv.load();
 
-    String sid = dotenv.get("TWILIO_ACCOUNT_SID");
-    String token = dotenv.get("TWILIO_AUTH_TOKEN");
+    private final RabbitTemplate rabbitTemplate;
+    private final ObjectMapper objectMapper;
+
+    public WhatsappService(RabbitTemplate rabbitTemplate, ObjectMapper objectMapper) {
+        this.rabbitTemplate = rabbitTemplate;
+        this.objectMapper = objectMapper;
+    }
 
     public void sendWhatsappReminder(String phone, BillRepositoryDTO bill) {
-        Twilio.init(sid, token);
-        Message message = Message.creator(
-                        new PhoneNumber("whatsapp:+55" + phone),
-                        new PhoneNumber("whatsapp:+14155238886"),
-                        "A sua conta " + bill.description() + " está próximo de vencer!!" +
-                        "\n vencimento:" + bill.dueDate()+
-                        "\n pague o quanto antes")
-                .create();
+        String mensagem = "💰 A sua conta *" + bill.description() + "* está próxima de vencer!" +
+                "\n📅 Vencimento: " + bill.dueDate() +
+                "\nPague o quanto antes para evitar multas.";
 
-        System.out.println(message.getSid());
+        Map<String, String> payload = new HashMap<>();
+
+        payload.put("numero", "55" + phone);
+        payload.put("mensagem", mensagem);
+
+        try {
+            String json = objectMapper.writeValueAsString(payload);
+
+            rabbitTemplate.convertAndSend("me-paga-rabbit", json);
+
+            System.out.println("✅ Mensagem enviada para o RabbitMQ");
+        } catch (Exception e) {
+            System.err.println("❌ Erro ao enviar mensagem para RabbitMQ: " + e.getMessage());
+        }
     }
 }
