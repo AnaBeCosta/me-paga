@@ -2,26 +2,39 @@ const amqp = require('amqplib');
 const whatsappClient = require('../whatsapp/client');
 
 async function consumeFromQueue(queue) {
-    const conn = await amqp.connect('amqp://localhost');
-    const channel = await conn.createChannel();
+    let conn;
+    let channel;
 
-    await channel.assertQueue(queue, { durable: true });
+    try {
+        conn = await amqp.connect('amqp://localhost');
+        channel = await conn.createChannel();
 
-    channel.consume(queue, async (msg) => {
-        if (msg !== null) {
-            const data = JSON.parse(msg.content.toString());
-            console.log('Received:', data);
+        await channel.assertQueue(queue, { durable: true });
+
+        console.log(`📥 Aguardando mensagens na fila "${queue}"...`);
+
+        channel.consume(queue, async (msg) => {
+            if (!msg) return;
 
             try {
-                await whatsappClient.sendMessage(data.to, data.message);
-                console.log('Message sent to:', data.to);
-            } catch (err) {
-                console.error('Error sending WhatsApp message:', err);
-            }
+                const data = JSON.parse( msg.content.toString());
 
-            channel.ack(msg);
-        }
-    });
+                console.log('📱 Número:', data.numero);
+                console.log('💬 Conteúdo:', data.mensagem);
+
+                await whatsappClient.sendMessage(data.numero, data.mensagem);
+                console.log(`✅ Mensagem enviada para: ${data.numero}`);
+
+                channel.ack(msg);
+            } catch (err) {
+                console.error('❌ Erro ao processar mensagem:', err);
+                // Se quiser reencaminhar para fila de erro, pode usar channel.nack(msg, false, false)
+                channel.nack(msg, false, false);
+            }
+        });
+    } catch (err) {
+        console.error('❌ Erro ao conectar no RabbitMQ:', err);
+    }
 }
 
 module.exports = { consumeFromQueue };

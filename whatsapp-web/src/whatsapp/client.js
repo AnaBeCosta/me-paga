@@ -17,11 +17,14 @@ client.on('qr', (qr) => {
 });
 
 client.on('ready', () => {
+  client.sendMessage("5515996415201", "taserto");
   console.log('✅ Cliente WhatsApp está pronto!');
 });
 
 client.on('auth_failure', (msg) => {
   console.error('❌ Falha na autenticação:', msg);
+  client.destroy();     // encerra cliente atual
+  client.initialize();
 });
 
 client.on('disconnected', (reason) => {

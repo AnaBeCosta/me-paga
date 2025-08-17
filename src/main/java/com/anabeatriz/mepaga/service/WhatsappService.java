@@ -20,7 +20,7 @@ public class WhatsappService {
     }
 
     public void sendWhatsappReminder(String phone, BillRepositoryDTO bill) {
-        String mensagem = "💰 A sua conta *" + bill.description() + "* está próxima de vencer!" +
+        String mensagem = "A sua conta *" + bill.description() + "* está próxima de vencer!" +
                 "\n📅 Vencimento: " + bill.dueDate() +
                 "\nPague o quanto antes para evitar multas.";
 
@@ -30,9 +30,7 @@ public class WhatsappService {
         payload.put("mensagem", mensagem);
 
         try {
-            String json = objectMapper.writeValueAsString(payload);
-
-            rabbitTemplate.convertAndSend("me-paga-rabbit", json);
+            rabbitTemplate.convertAndSend("me-paga-rabbit", payload);
 
             System.out.println("✅ Mensagem enviada para o RabbitMQ");
         } catch (Exception e) {
