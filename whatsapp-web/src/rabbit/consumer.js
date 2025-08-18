@@ -1,7 +1,6 @@
 const amqp = require('amqplib');
-const whatsappClient = require('../whatsapp/client');
 
-async function consumeFromQueue(queue) {
+async function consumeFromQueue(queue, whatsappClient) {
     let conn;
     let channel;
 
@@ -18,13 +17,11 @@ async function consumeFromQueue(queue) {
 
             try {
                 const data = JSON.parse( msg.content.toString());
+                const chatId = `${data.numero}@c.us`;
 
-                console.log('📱 Número:', data.numero);
-                console.log('💬 Conteúdo:', data.mensagem);
+                await whatsappClient.sendMessage(chatId, data.mensagem);
 
-                await whatsappClient.sendMessage(data.numero, data.mensagem);
-                console.log(`✅ Mensagem enviada para: ${data.numero}`);
-
+                console.log(data);
                 channel.ack(msg);
             } catch (err) {
                 console.error('❌ Erro ao processar mensagem:', err);

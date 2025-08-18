@@ -20,9 +20,10 @@ public class WhatsappService {
     }
 
     public void sendWhatsappReminder(String phone, BillRepositoryDTO bill) {
-        String mensagem = "A sua conta *" + bill.description() + "* está próxima de vencer!" +
+        String mensagem = "\uD83D\uDCB0 A sua conta *" + bill.description() + "* está próxima de vencer!" +
                 "\n📅 Vencimento: " + bill.dueDate() +
-                "\nPague o quanto antes para evitar multas.";
+                "\nPague o quanto antes para evitar multas." +
+                "\n\nEnvie a mensagem 'Pago' caso já tenha feito o pagamento";
 
         Map<String, String> payload = new HashMap<>();
 

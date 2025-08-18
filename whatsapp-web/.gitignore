@@ -1,3 +1,37 @@
-whatsapp-web/node_modules
-whatsapp-web/.wwebjs_cache
-whatsapp-web/.wwebjs_auth
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Local Authentication folder for whatsapp-web.js
+# IMPORTANTE: Esta pasta contém os dados da sua sessão do WhatsApp. Nunca a envie para o Git.
+.wwebjs_auth/
+
+# Environment variables
+# Arquivos que podem conter senhas e chaves de API
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs and editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+Thumbs.db
